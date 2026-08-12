@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ business_name }} — SmartLead AI Asistanı</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        window.SESSION_ID = "{{ session_id }}";
+    </script>
+</head>
+<body>
+
+    <!-- Navigasyon Çubuğu -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-paw"></i>
+            </div>
+            <div class="brand-text">
+                <h1>{{ business_name }}</h1>
+                <p>{{ business_slogan }}</p>
+            </div>
+        </a>
+        <div class="nav-actions">
+            <a href="tel:{{ business_phone }}" class="btn btn-outline">
+                <i class="fa-solid fa-phone"></i> {{ business_phone }}
+            </a>
+            {% if wix_booking_url %}
+            <a href="{{ wix_booking_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-accent" id="wixBookingNavBtn">
+                <i class="fa-solid fa-calendar-check"></i> Randevu Al
+            </a>
+            {% else %}
+            <button id="openLeadBtn" class="btn btn-accent">
+                <i class="fa-solid fa-calendar-check"></i> Randevu Al
+            </button>
+            {% endif %}
+            <a href="/dashboard" class="btn btn-outline">
+                <i class="fa-solid fa-user-gear"></i> Yönetim Paneli
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Bölümü -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fa-solid fa-sparkles"></i> Yapay Zeka Destekli 7/24 Veteriner Danışmanı
+            </div>
+            <h1 class="hero-title">
+                Sevimli Dostlarınız İçin <span>En İyi Bakım ve Teşhis</span> Hizmeti
+            </h1>
+            <p class="hero-desc">
+                SallyPet Veteriner Kliniği'nde kedi, köpek ve egzotik dostlarınız için uzman hekim kadromuz, tam donanımlı ameliyathanemiz ve 7/24 acil servisimizle hizmetinizdeyiz. Yapay zeka asistanımız Sally'ye sorularınızı hemen sorabilirsiniz!
+            </p>
+            <div class="hero-cta">
+                <button onclick="document.getElementById('chatInput').focus()" class="btn btn-primary">
+                    <i class="fa-solid fa-comments"></i> Sally ile Sohbet Et
+                </button>
+                {% if wix_booking_url %}
+                <a href="{{ wix_booking_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-accent" id="heroBookingBtn">
+                    <i class="fa-solid fa-calendar-check"></i> Hemen Randevu Al
+                </a>
+                {% else %}
+                <button id="openLeadBtn" class="btn btn-accent">
+                    <i class="fa-solid fa-calendar-check"></i> Randevu Al
+                </button>
+                {% endif %}
+                <a href="#features" class="btn btn-outline">Hizmetlerimiz</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <h4>7/24</h4>
+                    <p>Acil Servis</p>
+                </div>
+                <div class="stat-item">
+                    <h4>15.000+</h4>
+                    <p>Mutlu Dostumuz</p>
+                </div>
+                <div class="stat-item">
+                    <h4>12 Hekim</h4>
+                    <p>Uzman Kadro</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Sohbet Widget Konteynırı -->
+        <div class="chat-widget-container">
+            <div class="chat-header">
+                <div class="chat-bot-info">
+                    <div class="avatar">
+                        <i class="fa-solid fa-cat"></i>
+                    </div>
+                    <div>
+                        <h3>Sally — AI Veteriner Asistanı</h3>
+                        <div class="status-online">
+                            <span class="status-dot"></span> Çevrimiçi & Yanıtlamaya Hazır
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-robot" style="font-size: 1.25rem; opacity: 0.8;"></i>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message-bubble msg-ai">
+                    Merhaba! 🐾 Ben <strong>SallyPet Veteriner Kliniği</strong> yapay zekâ asistanı Sally. Minik dostunuzun sağlığı, aşı takvimi, muayene veya randevu taleplerinizle ilgili size nasıl yardımcı olabilirim?
+                </div>
+            </div>
+
+            <!-- Hızlı Sorular -->
+            <div class="quick-prompts">
+                <div class="quick-chip" data-prompt="Acil servisiniz nerede ve açık mı?">🚨 Acil Servis</div>
+                <div class="quick-chip" data-prompt="Kedi ve köpek aşı takvimi hakkında bilgi verir misin?">💉 Aşı Takvimi</div>
+                <div class="quick-chip" data-prompt="Kısırlaştırma ve muayene ücretleri ne kadar?">🩺 Muayene Ücreti</div>
+                <div class="quick-chip" data-prompt="Randevu almak istiyorum">📅 Randevu Al</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Bir soru sorun (Örn: Aşı saatleri, acil durum...)" autocomplete="off">
+                <button id="sendBtn" class="send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hizmetlerimiz Bölümü -->
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <h2>Öne Çıkan Hizmetlerimiz</h2>
+            <p>Kliniğimizde sunduğumuz modern tıp ve uzman bakım imkanları</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-kit-medical"></i></div>
+                <h3>7/24 Acil Müdahale</h3>
+                <p>Kaza, zehirlenme ve ani rahatsızlıklarda kesintisiz müdahale ve yoğun bakım ünitesi.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-syringe"></i></div>
+                <h3>Aşı & Koruyucu Hekimlik</h3>
+                <p>Düzenli parazit uygulamaları, dijital karne takibi ve zamanında hatırlatma servisleri.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-scissors"></i></div>
+                <h3>Pet Kuaför & Bakım</h3>
+                <p>Anestezi gerektirmeyen şefkatli tıraş, medikal banyo ve tırnak bakımı.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-x-ray"></i></div>
+                <h3>Röntgen & Laboratuvar</h3>
+                <p>Yüksek çözünürlüklü dijital röntgen ve 15 dakikada sonuç veren kan analizi cihazları.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal Lead Formu (İletişim/Randevu Bırakma) -->
+    <div class="modal-overlay" id="leadModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-paw" style="color: var(--primary);"></i> İletişim / Randevu Talebi</h3>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+                Bilgilerinizi bırakın, SallyPet veteriner hekimlerimiz en kısa sürede sizi arayarak randevu oluştursun.
+            </p>
+            <form id="leadForm">
+                <div class="form-group">
+                    <label for="fullName">Adınız ve Soyadınız *</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="Örn: Ayça Kartal" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefon Numaranız *</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="Örn: 0555 123 45 67" required>
+                </div>
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label for="petName">Dostunuzun Adı</label>
+                        <input type="text" id="petName" class="form-control" placeholder="Örn: Pamuk">
+                    </div>
+                    <div>
+                        <label for="petType">Tür / Cins</label>
+                        <select id="petType" class="form-control">
+                            <option value="Kedi">Kedi</option>
+                            <option value="Köpek">Köpek</option>
+                            <option value="Kuş">Kuş</option>
+                            <option value="Egzotik">Egzotik / Diğer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notunuz / Şikayetiniz</label>
+                    <textarea id="notes" class="form-control" rows="2" placeholder="Örn: Yıllık karma aşı randevusu istiyoruz..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-paper-plane"></i> Bilgilerimi Gönder
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        window.WIX_BOOKING_URL = "{{ wix_booking_url }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>

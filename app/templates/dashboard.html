@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yönetim Paneli — {{ business_name }} SmartLead AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="background: #f1f5f9;">
+
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <div class="brand-logo" style="background: linear-gradient(135deg, var(--dark-surface), var(--dark));">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="brand-text">
+                <h1>{{ business_name }} — Yönetim Paneli</h1>
+                <p>Müşteri Adayları (Lead) ve Randevu Yönetimi</p>
+            </div>
+        </a>
+        <div class="nav-actions">
+            <a href="/" class="btn btn-outline">
+                <i class="fa-solid fa-arrow-left"></i> Karşılama Sayfasına Dön
+            </a>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        
+        <!-- İstatistik Kartları -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ stats.total }}</h3>
+                    <p>Toplam İletişim Kaydı</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon new">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ stats.new }}</h3>
+                    <p>Yeni Bekleyen Kayıtlar</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon contacted">
+                    <i class="fa-solid fa-phone-volume"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ stats.contacted }}</h3>
+                    <p>Aranan Müşteriler</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon appointment">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ stats.appointment }}</h3>
+                    <p>Oluşturulan Randevular</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ana Tablo Kartı -->
+        <div class="table-card">
+            <div class="table-toolbar">
+                <div class="filter-tags">
+                    {% for st in ['Tümü', 'Yeni', 'Arandı', 'Randevu Oluşturuldu', 'Tamamlandı', 'İptal'] %}
+                    <a href="/dashboard?status={{ st }}&search={{ search_query }}" 
+                       class="filter-tag {{ 'active' if current_status == st else '' }}">
+                        {{ st }}
+                    </a>
+                    {% endfor %}
+                </div>
+
+                <form method="GET" action="/dashboard" class="search-box">
+                    <input type="hidden" name="status" value="{{ current_status }}">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="İsim, Tel veya Not Ara...">
+                    {% if search_query %}
+                    <a href="/dashboard?status={{ current_status }}" style="color: var(--danger); font-size: 0.8rem; text-decoration: none;">&times; Temizle</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            {% if leads %}
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Müşteri Adı</th>
+                            <th>Telefon</th>
+                            <th>Pet Adı / Türü</th>
+                            <th>Not / Şikayet</th>
+                            <th>Tarih</th>
+                            <th>Durum</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td><strong>#{{ lead.id }}</strong></td>
+                            <td><strong>{{ lead.full_name }}</strong></td>
+                            <td>
+                                <a href="tel:{{ lead.phone }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+                                    <i class="fa-solid fa-phone" style="font-size: 0.75rem;"></i> {{ lead.phone }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if lead.pet_name %}
+                                🐾 {{ lead.pet_name }} <span style="color: var(--text-muted); font-size: 0.8rem;">({{ lead.pet_type }})</span>
+                                {% else %}
+                                <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                            <td style="max-width: 240px; white-space: normal;">{{ lead.notes or '-' }}</td>
+                            <td style="font-size: 0.82rem; color: var(--text-muted);">{{ lead.created_at }}</td>
+                            <td>
+                                <select class="status-select form-control" data-lead-id="{{ lead.id }}" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; font-weight: 600;">
+                                    {% for opt in ['Yeni', 'Arandı', 'Randevu Oluşturuldu', 'Tamamlandı', 'İptal'] %}
+                                    <option value="{{ opt }}" {{ 'selected' if lead.status == opt else '' }}>{{ opt }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <button class="delete-lead-btn btn" data-lead-id="{{ lead.id }}" style="padding: 0.3rem 0.6rem; background: #fee2e2; color: #b91c1c; border-radius: var(--radius-sm);">
+                                    <i class="fa-solid fa-trash-can"></i> Sil
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+                <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.4;"></i>
+                <h3>Henüz Lead Kaydı Bulunmuyor</h3>
+                <p>Arama kriterlerinize veya seçili filtreye uyan bir iletişim kaydı bulunamadı.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
