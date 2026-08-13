@@ -42,7 +42,7 @@ def dashboard():
         business_name=Config.BUSINESS_NAME
     )
 
-@main_bp.route('/api/chat', methods=['POST'])
+@main_bp.route('/api/sohbet', methods=['POST'])
 def api_chat():
     data = request.get_json() or {}
     session_id = data.get('session_id')
@@ -58,7 +58,7 @@ def api_chat():
         'suggest_lead_form': result['suggest_lead_form']
     })
 
-@main_bp.route('/api/lead', methods=['POST'])
+@main_bp.route('/api/leads', methods=['POST'])
 def api_lead():
     data = request.get_json() or {}
     full_name = data.get('full_name', '').strip()
