@@ -9,8 +9,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'sallypet-smartlead-ai-secret-key-2026')
     DATABASE_PATH = os.path.join(BASE_DIR, 'sallypet.db')
     GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-    GROQ_MODEL = 'llama-3.3-70b-versatile'  # Groq üzerindeki varsayılan model
-
+    GROQ_MODEL = 'openai/gpt-oss-120b'
     # Wix Bookings Entegrasyonu
     WIX_BOOKING_URL = os.getenv('WIX_BOOKING_URL', '')   # Wix randevu sayfası URL'si
     WIX_API_TOKEN = os.getenv('WIX_API_TOKEN', '')       # Wix IST token (ileride OAuth için)
