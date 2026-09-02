@@ -1,5 +1,6 @@
 import uuid
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
+from flask_cors import CORS
 from config import Config
 from app.database import (
     add_lead, get_all_leads, get_lead_by_id, update_lead_status, delete_lead, get_lead_stats, get_chat_history
@@ -7,6 +8,17 @@ from app.database import (
 from app.services.ai_service import generate_ai_response
 
 main_bp = Blueprint('main', __name__)
+
+# Wix sitesinden gelen isteklere izin ver (Render <-> Wix arası API çağrıları için)
+CORS(main_bp, resources={
+    r"/api/*": {
+        "origins": [
+            "https://kartalayca98.wixstudio.com/my-site",       # Wix sitenin yayındaki (published) domaini
+            "https://*.wixsite.com",              # Wix'in editör/preview alt domaini (varsa)
+            "https://*.filesusr.com"              # Wix'in bazı iframe/embed senaryoları
+        ]
+    }
+})
 
 @main_bp.route('/')
 def index():
@@ -32,7 +44,6 @@ def dashboard():
     
     leads = get_all_leads(status_filter=status_filter, search_query=search_query)
     stats = get_lead_stats()
-
     return render_template(
         'dashboard.html',
         leads=leads,
@@ -47,10 +58,8 @@ def api_chat():
     data = request.get_json() or {}
     session_id = data.get('session_id')
     user_message = data.get('message', '').strip()
-
     if not session_id or not user_message:
         return jsonify({'error': 'Geçersiz mesaj veya oturum kimliği.'}), 400
-
     result = generate_ai_response(session_id, user_message)
     return jsonify({
         'success': True,
@@ -66,10 +75,8 @@ def api_lead():
     pet_name = data.get('pet_name', '').strip()
     pet_type = data.get('pet_type', '').strip()
     notes = data.get('notes', '').strip()
-
     if not full_name or not phone:
         return jsonify({'error': 'Lütfen Ad Soyad ve Telefon numarası alanlarını doldurun.'}), 400
-
     lead_id = add_lead(full_name, phone, pet_name, pet_type, notes)
     
     return jsonify({
@@ -82,10 +89,8 @@ def api_lead():
 def api_update_status(lead_id):
     data = request.get_json() or {}
     new_status = data.get('status')
-
     if not new_status:
         return jsonify({'error': 'Yeni durum belirtilmedi.'}), 400
-
     updated = update_lead_status(lead_id, new_status)
     if updated:
         return jsonify({'success': True, 'message': 'Lead durumu güncellendi.'})
